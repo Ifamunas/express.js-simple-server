@@ -1,0 +1,648 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: E-commerce API
+  description: API for an E-Commerce platform
+  contact:
+    name: Fatima Alnasser
+    email: fmnu11@outlook.com
+
+servers:
+  - url: http://127.0.0.1:8080
+
+tags:
+  - name: Products
+    description: operations for Products
+  - name: Users
+    description: operations for Users
+  - name: Orders
+    description: operations for Orders
+  - name: Categories
+    description: operations for Categories
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - description
+        - image
+        - price
+        - category
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        price:
+          type: number
+        category:
+          type: array
+          items:
+            type: number
+        variants:
+          type: array
+          items:
+            type: string
+        sizes:
+          type: array
+          items:
+            type: string
+      example:
+        id: 1
+        name: laptop
+        image: https://public_laptop-image2
+        description: high performance laptop for all your needs
+        categories: [1, 3]
+        variance: [225GB, 550GB]
+        sizes: [13-inch, 15-inch]
+        price: 2500
+
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        id:
+          type: number
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+      example:
+        id: 1
+        firstName: John
+        lastName: Smith
+        email: JohnSmith@example.com
+        password: hashed_password
+        role: visitor
+
+    Category:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+      example:
+        id: 1
+        name: Electronics
+
+    Order:
+      type: object
+      required:
+        - productId
+        - userId
+        - products
+        - purchasedAt
+        - total
+      properties:
+        id:
+          type: number
+        productId:
+          type: number
+        userId:
+          type: number
+        products: 
+          type: array
+          items: 
+            $ref: "#/components/schemas/Product"
+        purchasedAt:
+          type: string
+        total:
+          type: number
+
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: retrieve all products
+      responses:
+        200:
+          description: all products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+        500:
+          description: server error
+
+    post:
+      tags:
+        - Products
+      summary: create new product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        201:
+          description: a new product is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+        500:
+          description: server error
+
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      summary: retrieve a single product by id
+      responses:
+        200:
+          description: a product is retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+        500:
+          description: server error
+
+    put:
+      tags:
+        - Products
+      summary: update a product based on id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        201:
+          description: product is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - Products
+      summary: delete product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the product deleted successfully
+        500:
+          description: server error
+
+  /products/search:
+    get:
+      tags:
+        - Products
+      summary: retrieve all products that match a search term
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: all matched products are retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: retrieve all users
+      responses:
+        200:
+          description: all users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+        500:
+          description: server error
+
+    post:
+      tags:
+        - Users
+      summary: create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: a new user is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+        500:
+          description: server error
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: retrieve a single user by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: a user is retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+        500:
+          description: server error
+
+    put:
+      tags:
+        - Users
+      summary: update a user based on id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        201:
+          description: user is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - Users
+      summary: delete user by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the user deleted successfully
+        500:
+          description: server error
+
+  /users/search:
+    get:
+      tags:
+        - Users
+      summary: retrieve all users that match a search term
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: all matched users are retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: user authentication based on email and password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        201: 
+          description: user authenticated 
+        401:
+          description: user unauthorized
+        500: 
+          description: server error
+
+  /users/logout:
+    post: 
+      tags: 
+        - Users
+      summary: logout user from the system
+      responses:
+        201: 
+          description: user logged out successfully
+        500: 
+          description: server error 
+
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: retrieve all orders
+      responses:
+        200:
+          description: all orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+        500:
+          description: server error
+
+    post:
+      tags:
+        - Orders
+      summary: create new order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        201:
+          description: a new user is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+        500:
+          description: server error
+
+  /orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: retrieve a single order by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: an order is retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+        500:
+          description: server error
+
+    put:
+      tags:
+        - Orders
+      summary: update an order based on id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        201:
+          description: order is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - Orders
+      summary: delete order by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the order deleted successfully
+        500:
+          description: server error
+
+  /orders/search:
+    get:
+      tags:
+        - Orders
+      summary: retrieve all orders that match a search term
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: all matched orders are retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /category:
+    get:
+      tags:
+        - Categories
+      summary: retrieve all categories
+      responses:
+        200:
+          description: all categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+        500:
+          description: server error
+
+    post:
+      tags:
+        - Categories
+      summary: create new category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      responses:
+        201:
+          description: a new category is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+        500:
+          description: server error
+
+  /categories/{id}:
+    get:
+      tags:
+        - Categories
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      summary: retrieve a single category by id
+      responses:
+        200:
+          description: category is retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+        500:
+          description: server error
+
+    put:
+      tags:
+        - Categories
+      summary: update a category based on id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        201:
+          description: category is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+        500:
+          description: server error
+
+    delete:
+      tags:
+        - Categories
+      summary: delete category by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the category deleted successfully
+        500:
+          description: server error
+
+  /categories/search:
+    get:
+      tags:
+        - Categories
+      summary: retrieve all categories that match a search term
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: all matched categories are retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
